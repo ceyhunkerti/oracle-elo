@@ -1,0 +1,132 @@
+<template lang="pug">
+  div(:style="{height:height,width:width}")
+</template>
+
+<script>
+import _ from 'lodash'
+import echarts from 'echarts'
+require('echarts/theme/macarons') // echarts theme
+import { debounce } from '@/util'
+
+export default {
+  props: {
+    className: { type: String, default: 'chart' },
+    width: { type: String, default: '100%' },
+    height: { type: String, default: '400px' },
+    data: { type: Object, required: true}
+  },
+  data() {
+    return {
+      chart: null,
+      option: {}
+    }
+  },
+  mounted() {
+    this.initChart()
+    this.__resizeHanlder = debounce(() => {
+      if (this.chart) {
+        this.chart.resize()
+      }
+    }, 100)
+    window.addEventListener('resize', this.__resizeHanlder)
+  },
+  beforeDestroy() {
+    if (!this.chart) {
+      return
+    }
+    window.removeEventListener('resize', this.__resizeHanlder)
+    this.chart.dispose()
+    this.chart = null
+  },
+  watch: {
+    'data'() {
+      this.option.series[0].data[0].value = Math.round(100 * (this.data.success / this.data.total));
+      if (this.chart) {
+        this.chart.setOption(this.option,true);
+      }
+    }
+  },
+  methods: {
+    initChart() {
+      this.chart = echarts.init(this.$el, 'macarons')
+      const names = ['Ready', 'Success', 'Error', 'Running']
+      const data = [
+        { name: "Ready", value: this.data.ready,  itemStyle: {color: '#FFC107'} },
+        { name: "Success", value: this.data.success, itemStyle: {color: '#4CAF50'} },
+        { name: "Error", value: this.data.error, itemStyle: {color: '#FF5252'} },
+        { name: "Running", value: this.data.running, itemStyle: {color: '#03A9F4'} }
+      ]
+
+      this.option = {
+        title : {
+          text: 'Progress',
+          subtext: 'successfull extractions',
+          x:'center'
+        },
+        tooltip : {
+            formatter: "{a} <br/>{c} {b}"
+        },
+        toolbox: {
+          show : true,
+          feature : {
+            mark : {show: true},
+            dataView : {
+              show: true, readOnly: true, title: 'Data view',
+              lang: ['Data view', 'Close', 'Reload']
+            },
+            magicType : {
+                show: true,
+                type: ['pie', 'funnel']
+            },
+            restore : {show: true, title: 'Restore'},
+            saveAsImage : {show: true, title: 'Save as image'}
+          }
+        },
+        series : [{
+          name:'Progress',
+          type:'gauge',
+          radius : '60%',
+          z: 3,
+          min:0,
+          max: 100,
+          splitNumber:10,
+          axisLine: {
+            lineStyle: {
+              width: 10
+            }
+          },
+          axisTick: {
+            length :15,
+            lineStyle: {
+              color: 'auto'
+            }
+          },
+          splitLine: {
+            length :20,
+            lineStyle: {
+              color: 'auto'
+            }
+          },
+          title : {
+            textStyle: {
+              fontWeight: 'bolder',
+              fontSize: 20,
+              fontStyle: 'italic'
+            }
+          },
+          detail : {
+            textStyle: {
+              fontWeight: 'bolder'
+            }
+          },
+          data:[{value: Math.round(100 * (this.data.success / this.data.total)), name: '%'}]
+          }
+        ]
+      };
+
+      this.chart.setOption(this.option)
+
+    }
+  }
+}
+</script>

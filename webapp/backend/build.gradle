@@ -1,0 +1,164 @@
+buildscript {
+	ext {
+		springBootVersion = '1.4.1.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'scala'
+
+sourceSets {
+    main {
+        scala {
+            srcDirs = ['src/main/scala']
+        }
+    }
+}
+
+
+def _versionCode=0
+def _major=0
+def _minor=0
+def _patch=0
+def _applicationId = "io.blue.elo"
+def versionPropsFile = file('version.properties')
+
+if (versionPropsFile.canRead()) {
+    def Properties versionProps = new Properties()
+
+    versionProps.load(new FileInputStream(versionPropsFile))
+
+    _patch = versionProps['PATCH'].toInteger() + 1
+    _major = versionProps['MAJOR'].toInteger()
+    _minor = versionProps['MINOR'].toInteger()
+    _versionCode= versionProps['VERSION_CODE'].toInteger()+1
+    if(_patch==99)
+    {
+        _patch=0
+        _minor=_minor+1
+    }
+    if(_major==99){
+        _major=0
+        _major=_major+1
+    }
+
+    versionProps['MAJOR']=_major.toString()
+    versionProps['MINOR']=_minor.toString()
+    versionProps['PATCH']=_patch.toString()
+    versionProps['VERSION_CODE']=_versionCode.toString()
+    versionProps.store(versionPropsFile.newWriter(), null)
+}
+else {
+    throw new GradleException("Could not read version.properties!")
+}
+def _versionName = "${_major}.${_versionCode}.${_minor}.${_patch}"
+
+
+jar {
+	baseName = 'elo'
+  version = null
+	// version = "${_versionName}"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+bootRun {
+    addResources = true
+}
+
+springBoot {
+    mainClass = 'io.blue.Application'
+}
+
+
+dependencies {
+
+  compile group: 'com.zaxxer', name: 'HikariCP', version: '3.1.0'
+
+  compile files("${System.properties['java.home']}/../lib/tools.jar")
+	compile "org.springframework.boot:spring-boot-devtools"
+
+
+	compile 'org.scala-lang:scala-library'
+  compile group: 'com.h2database', name: 'h2'
+
+
+  compile group: 'org.hsqldb', name: 'hsqldb', version: '2.4.0'
+
+  // built in drivers
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
+
+
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+	compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
+
+  compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.4.17'
+  compile group: 'com.typesafe.akka', name: 'akka-slf4j_2.11', version: '2.4.17'
+
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate5', version: '2.8.8'
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-scala_2.10', version: '2.8.8'
+
+  testCompile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.0.Beta2'
+
+  compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-web')
+  testCompile('org.springframework.boot:spring-boot-starter-test')
+  compile("org.webjars:webjars-locator")
+
+  compile("org.webjars:sockjs-client:1.0.2")
+  compile("org.webjars:stomp-websocket:2.3.3")
+
+  compile group: 'org.springframework', name: 'spring-context-support', version: '4.3.8.RELEASE'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-remote-shell', version: '1.5.1.RELEASE'
+
+
+  // securrity
+  compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
+  compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.3.RELEASE'
+
+
+
+
+  // odi
+  compile group: 'bsf', name: 'bsf', version: '2.3.0'
+  compile group: 'trove', name: 'trove', version: '1.0.2'
+  compile group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.jpa', version: '2.7.0'
+  compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+  compile group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.oracle', version: '2.7.0'
+
+  compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+
+  compile files("${System.properties['java.home']}/../lib/tools.jar")
+
+  compile fileTree(include: [
+    '*.jar'
+  ], dir: 'lib')
+
+
+  compile fileTree(include: ['*.jar'], dir: 'lib/odi/oracle.jps')
+
+  compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
+  compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+  compile group: 'javolution', name: 'javolution', version: '5.5.1'
+  compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+  compile group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.moxy', version: '2.7.0'
+  compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+  compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.10'
+  compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
+
+}
