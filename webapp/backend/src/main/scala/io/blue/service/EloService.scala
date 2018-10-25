@@ -45,7 +45,15 @@ class EloService{
   }
 
   def findEloStatus = {
-    case class Status(success: Int = 0, error: Int = 0, ready: Int = 0, running: Int = 0, total: Int = 0)
+    case class Status(
+      success: Int = 0,
+      error: Int = 0,
+      ready: Int = 0,
+      running: Int = 0,
+      total: Int = 0,
+      startTime: Long = 0,
+      endTime: Long = 0
+    )
     var result: Status =  null
     val q = """
       select
@@ -53,7 +61,9 @@ class EloService{
         sum(case when status = 'ERROR' then 1 else 0 end) error,
         sum(case when status = 'READY' then 1 else 0 end) ready,
         sum(case when status = 'RUNNING' then 1 else 0 end) running,
-        sum(1) total
+        sum(1) total,
+        min(start_time) start_time,
+        max(end_time) end_time
       from elo_tables
       where status in ('SUCCESS', 'ERROR', 'READY', 'RUNNING') and excluded = 0
     """
@@ -64,7 +74,9 @@ class EloService{
       while(rs.next) {
         result = new Status(
           rs.getInt("success"), rs.getInt("error"), rs.getInt("ready"),
-          rs.getInt("running"), rs.getInt("total"))
+          rs.getInt("running"), rs.getInt("total"),
+          rs.getDate("start_time").getTime, rs.getDate("end_time").getTime
+        )
       }
       connection.close
     } catch {

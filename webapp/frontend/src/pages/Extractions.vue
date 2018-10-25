@@ -43,13 +43,20 @@
               v-btn(icon @click="onReload" slot="activator")
                 v-icon refresh
               span Reload
+            v-menu(bottom='' left='')
+              v-btn(slot='activator' icon)
+                v-icon filter_list
+              v-list
+                v-list-tile(v-for='(item, i) in statuses' :key='i' @click='onStatusFilter(item)')
+                  v-list-tile-title {{ item }}
             v-btn(outline round color="success" @click="createTableVisible = true") Create Table
+
           v-divider
           v-card-text.pa-0
             v-data-table.elevation-1(
               :pagination.sync="pagination"
               :loading="loading"
-              :headers='columns.headers' :search='search' :items='maps'
+              :headers='columns.headers' :search='search' :items='_maps'
               :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
               item-key='name' select-all
               v-model='selected'
@@ -101,6 +108,8 @@ export default {
       createTableVisible: false,
       search: '',
       selected: [],
+      status: 'ALL',
+      statuses: ['RUNNING', 'ERROR', 'ALL'],
       pagination: {
         sortBy: 'name',
         descending: false
@@ -147,7 +156,11 @@ export default {
   computed: {
     ...mapGetters('elo', [
       'maps'
-    ])
+    ]),
+    _maps() {
+      if (this.status === 'ALL') { return this.maps }
+      return _.filter(this.maps, { status: this.status })
+    }
   },
   methods: {
     ...mapActions('elo', [
@@ -159,6 +172,9 @@ export default {
       'runMap',
       'deleteMap'
     ]),
+    onStatusFilter(status) {
+      this.status = status
+    },
     ask(options) {
       this.prompt = options
       this.promptVisible = true

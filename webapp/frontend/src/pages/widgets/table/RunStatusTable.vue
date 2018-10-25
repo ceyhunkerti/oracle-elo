@@ -9,6 +9,7 @@ v-data-table(:items='items' hide-actions)
 <script>
 
 import _ from 'lodash'
+import moment from 'moment'
 
 export default {
   props: {
@@ -22,7 +23,10 @@ export default {
     items() {
       return _.chain(this.data).keys().map(k => {
         const name = _.capitalize(k)
-        const value = this.data[k]
+        let value = ((k === 'startTime' || k === 'endTime') ? moment(this.data[k]).format("HH:mm:ss") : this.data[k])
+        if (k === 'endTime' && (this.data.running > 0 || this.data.ready > 0)) {
+          value = moment().format("HH:mm:ss")
+        }
         return { name, value }
       }).value()
     }
