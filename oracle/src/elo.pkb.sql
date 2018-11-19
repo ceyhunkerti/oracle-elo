@@ -70,9 +70,9 @@ AS
   begin
     gv_proc := 'RUN';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc);
-    gv_sql := 'update util.elo_tables set 
+    gv_sql := 'update util.elo_tables set
       start_time = null,
-      end_time = null,  
+      end_time = null,
       status = upper('''|| GV_READY || ''')
     ';
     execute immediate gv_sql;
@@ -85,7 +85,7 @@ AS
   end;
 
 
-  procedure run(i_name varchar2, i_drop_create number default null, i_analyze number default null)
+  procedure run(i_name varchar2, i_drop_create number default null, i_analyze number default null, i_index_drop number := 1)
   is
     v_db_link         varchar2(60);
     v_source          varchar2(100);
@@ -101,6 +101,8 @@ AS
     v_source_cols     long;
     v_target_cols     long;
     v_delta_data_type varchar2(50);
+    v_index_ddls      dbms_sql.varchar2_table;
+    v_index_created   boolean := false;
   begin
 
     gv_proc := 'RUN';
@@ -198,9 +200,19 @@ AS
     end if;
 
 
+    if i_index_drop != 0 then
+      v_index_ddls := pl.index_ddls(v_target);
+      pl.drop_indexes(v_target);
+    end if;
+
     execute immediate gv_sql;
     pl.logger.success(SQL%ROWCOUNT || ' : inserted', gv_sql);
     commit;
+
+    if i_index_drop != 0 then
+      pl.exec(v_index_ddls, true);
+      v_index_created := true;
+    end if;
 
     if v_delta_column is not null then
       prc_update_last_delta(
@@ -221,6 +233,9 @@ AS
     when others then
       pl.logger.error(SQLCODE||' : '||SQLERRM, gv_sql);
       set_status(i_name, GV_ERROR);
+      if i_index_drop != 0 and v_index_created = false then
+        pl.exec(v_index_ddls, true);
+      end if;
       raise;
   end;
 
@@ -270,6 +285,21 @@ AS
     execute immediate gv_sql;
 
     commit;
+  end;
+
+
+  -- Args:
+  --    [i_source varchar2]: 'owner.source_table@dblink'
+  --    [i_create boolean := false]: create target table
+  procedure def(i_source varchar2, i_create boolean := false) is
+    v_tokens dbms_sql.varchar2_table;
+  begin
+    v_tokens := pl.split(i_source, '@');
+    def(
+      i_source  => v_tokens(1),
+      i_dblk    => v_tokens(2),
+      i_create  => i_create
+    );
   end;
 
   -- sugar for define

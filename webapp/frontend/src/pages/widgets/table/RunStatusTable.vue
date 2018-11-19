@@ -21,6 +21,13 @@ export default {
   },
   computed: {
     items() {
+
+      let startTime = moment(this.data.startTime)
+      let endTime = moment(this.data.endTime)
+      if (this.data.running > 0 || this.data.ready > 0) {
+        endTime = moment()
+      }
+      let duration = moment.utc(endTime.diff(startTime)).format("HH:mm:ss");
       return _.chain(this.data).keys().map(k => {
         const name = _.capitalize(k)
         let value = ((k === 'startTime' || k === 'endTime') ? moment(this.data[k]).format("HH:mm:ss") : this.data[k])
@@ -28,7 +35,8 @@ export default {
           value = moment().format("HH:mm:ss")
         }
         return { name, value }
-      }).value()
+      }).union([{ name: 'Duration', value: duration }]).value()
+
     }
   },
   methods: {

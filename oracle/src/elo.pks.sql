@@ -8,8 +8,11 @@ AS
   procedure run(
     i_name varchar2,
     i_drop_create number default null,
-    i_analyze number default null
+    i_analyze number default null,
+    i_index_drop number := 1
   );
+
+  procedure def(i_source varchar2, i_create boolean := false);
 
   procedure def(
     i_source        varchar2,
