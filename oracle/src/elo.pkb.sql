@@ -307,7 +307,7 @@ AS
     i_source varchar2,
     i_dblk  varchar2,
     i_elo_name  varchar2 default null,
-    i_target_schema varchar2 default 'ODS',
+    i_target_schema varchar2 default 'SG',
     i_create  boolean default false
   ) as
   begin
@@ -324,7 +324,7 @@ AS
     i_source varchar2,
     i_dblk  varchar2,
     i_elo_name  varchar2 default null,
-    i_target_schema varchar2 default 'ODS',
+    i_target_schema varchar2 default 'SG',
     i_create  boolean default false
   )
   is
@@ -372,7 +372,7 @@ AS
       loop
         fetch c into v_column_name, v_data_type, v_data_length;
         exit when c%notfound;
-        if v_data_type in ('CHAR','VARCHAR','VARCHAR2','NUMBER') then
+        if v_data_type in ('CHAR','VARCHAR','VARCHAR2','NUMBER', 'RAW') then
           v_columns := v_columns || v_column_name||' '||v_data_type||'('||v_data_length||'),'||chr(10);
         else
           v_columns := v_columns || v_column_name||' '||v_data_type||','||chr(10);
@@ -437,7 +437,7 @@ AS
     i_table varchar2,
     i_dblk  varchar2,
     i_name  varchar2 default null,
-    i_target_schema varchar2 default 'ODS'
+    i_target_schema varchar2 default 'SG'
   ) return varchar2
   is
     table_is_null     exception;
@@ -480,7 +480,7 @@ AS
       fetch c into v_column_name, v_data_type, v_data_length;
       exit when c%notfound;
 
-      if v_data_type in ('CHAR','VARCHAR','VARCHAR2','NUMBER') then
+      if v_data_type in ('CHAR','VARCHAR','VARCHAR2','NUMBER', 'RAW') then
         v_columns := v_columns || v_column_name||' '||v_data_type||'('||v_data_length||'),'||chr(10);
       else
         v_columns := v_columns || v_column_name||' '||v_data_type||','||chr(10);

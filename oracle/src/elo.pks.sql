@@ -18,15 +18,15 @@ AS
     i_source        varchar2,
     i_dblk          varchar2,
     i_elo_name      varchar2 default null,
-    i_target_schema varchar2 default 'ODS',
+    i_target_schema varchar2 default 'SG',
     i_create        boolean default false
   );
 
   procedure define(
-    i_source         varchar2,
+    i_source        varchar2,
     i_dblk          varchar2,
     i_elo_name      varchar2 default null,
-    i_target_schema varchar2 default 'ODS',
+    i_target_schema varchar2 default 'SG',
     i_create        boolean default false
   );
 
@@ -34,7 +34,7 @@ AS
     i_table         varchar2,
     i_dblk          varchar2,
     i_name          varchar2 default null,
-    i_target_schema varchar2 default 'ODS'
+    i_target_schema varchar2 default 'SG'
   ) return varchar2;
 
   function simulate(i_name varchar2) return clob;
