@@ -92,9 +92,10 @@ to define extraction rule for a table.
   ```
 
   ```sql
-    -- only the specified columns
+    -- all options
     begin
       util.elo.d(
+        i_name    => 'my_extraction',
         i_source  => 'src_owner.src_table_name',
         i_target  => 'trg_owner.trg_table_name',
         i_columns => 'first_col,second_col,another_col',
