@@ -77,7 +77,7 @@ to define extraction rule for a table.
   ```sql
     -- defines all columns of the table to column list
     begin
-      util.elo.def('src_owner.src_table_name@my_db_link');
+      util.elo.define('src_owner.src_table_name@my_db_link');
     end;
   ```
 
@@ -85,8 +85,20 @@ to define extraction rule for a table.
     -- only the specified columns
     begin
       util.elo.def(
-        i_source  com=> 'src_owner.src_table_name@my_db_link',
+        i_source  => 'src_owner.src_table_name@my_db_link',
         i_columns => 'first_col,second_col,another_col'
+      );
+    end;
+  ```
+
+  ```sql
+    -- only the specified columns
+    begin
+      util.elo.d(
+        i_source  => 'src_owner.src_table_name',
+        i_target  => 'trg_owner.trg_table_name',
+        i_columns => 'first_col,second_col,another_col',
+        i_db_link => 'my_db_link'
       );
     end;
   ```
