@@ -85,7 +85,7 @@ to define extraction rule for a table.
     -- only the specified columns
     begin
       util.elo.def(
-        i_source => 'src_owner.src_table_name@my_db_link',
+        i_source  com=> 'src_owner.src_table_name@my_db_link',
         i_columns => 'first_col,second_col,another_col'
       );
     end;
