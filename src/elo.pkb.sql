@@ -457,7 +457,6 @@ AS
       return;
     end if;
 
-
     if is_in_elo_tables(i_name) = false then
       gv_sql := '
         insert into util.elo_tables (
