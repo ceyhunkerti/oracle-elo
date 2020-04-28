@@ -100,6 +100,7 @@ to define extraction rule for a table.
         i_target  => 'trg_owner.trg_table_name',
         i_columns => 'first_col,second_col,another_col',
         i_db_link => 'my_db_link'
+        i_filter  => 'my_column = 2'
       );
     end;
   ```
@@ -114,4 +115,15 @@ to define extraction rule for a table.
     -- Definitions work in insert mode which means if table or column definitions already exists
     -- then only the new ones will be inserted. This method does not override any existing records in
     -- elo_tables or elo_columns
+  ```
+
+  There is also `add_filter` helper to add additional filtering to an existing extraction definition.
+
+  Example;
+
+  ```sql
+  --- this will generate a query with a `where [existing_filter and] my_column = 2`
+  begin
+    util.elo.add_filter('my_extraction_name', 'my_column = 2');
+  end;
   ```

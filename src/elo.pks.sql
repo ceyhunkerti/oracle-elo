@@ -17,21 +17,26 @@ AS
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   );
   procedure def(
     i_source  varchar2,
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   );
   procedure d(
     i_source  varchar2,
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   );
+
+  procedure add_filter(i_name varchar2, i_filter varchar2);
 
 END;

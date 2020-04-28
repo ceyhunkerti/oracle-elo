@@ -360,10 +360,11 @@ AS
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   ) is
   begin
-    define(i_source, i_name, i_target, i_db_link, i_columns);
+    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter);
   end;
 
   -- sugar for elo.define
@@ -372,10 +373,11 @@ AS
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   ) is
   begin
-    define(i_source, i_name, i_target, i_db_link, i_columns);
+    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter);
   end;
 
 
@@ -394,13 +396,14 @@ AS
     i_name    varchar2 := null,
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
-    i_columns long := null
+    i_columns long := null,
+    i_filter  varchar2 := null
   ) is
     e_source_parameter_error  exception;
     pragma exception_init(e_source_parameter_error,  -20170);
     v_tokens dbms_sql.varchar2_table;
   begin
-
+    gv_proc := 'define';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc||'-'||i_source);
 
     if i_source is null then
@@ -418,7 +421,8 @@ AS
         i_name    => i_name,
         i_target  => i_target,
         i_db_link => v_tokens(2),
-        i_columns => i_columns
+        i_columns => i_columns,
+        i_filter  => i_filter
       );
       return;
     end if;
@@ -429,7 +433,8 @@ AS
         i_name    => i_name,
         i_target  => i_source,
         i_db_link => i_db_link,
-        i_columns => i_columns
+        i_columns => i_columns,
+        i_filter  => i_filter
       );
       return;
     end if;
@@ -441,7 +446,8 @@ AS
         i_name    => v_tokens(2),
         i_target  => i_source,
         i_db_link => i_db_link,
-        i_columns => i_columns
+        i_columns => i_columns,
+        i_filter  => i_filter
       );
       return;
     end if;
@@ -452,7 +458,8 @@ AS
         i_name    => i_name,
         i_target  => i_source,
         i_db_link => i_db_link,
-        i_columns => pl.make_string(get_remote_col_list(i_source, i_db_link))
+        i_columns => pl.make_string(get_remote_col_list(i_source, i_db_link)),
+        i_filter  => i_filter
       );
       return;
     end if;
@@ -460,9 +467,9 @@ AS
     if is_in_elo_tables(i_name) = false then
       gv_sql := '
         insert into util.elo_tables (
-          name, db_link, source, target, drop_create
+          name, db_link, source, target, filter, drop_create
         ) values (
-          '''||i_name||''', '''||i_db_link||''', '''||i_source||''', '''||i_target||''', 1
+          '''||i_name||''', '''||i_db_link||''', '''||i_source||''', '''||i_target||''', '''||i_filter||''', 1
         )
       ';
       execute immediate gv_sql;
@@ -496,5 +503,33 @@ AS
       rollback;
       raise;
   end;
+
+
+  procedure add_filter(i_name varchar2, i_filter varchar2) is
+  begin
+    if i_name is null then return; end if;
+    gv_proc   := 'add_filter';
+    pl.logger := util.logtype.init(gv_pck||'.'||gv_proc);
+
+    gv_sql := '
+      update util.elo_tables
+      set filter =
+        case when filter is null then '''||i_filter||''' else '''||' and '||i_filter||''' end
+      where
+        name = '''||i_name||'''
+    ';
+
+    execute immediate gv_sql;
+    pl.logger.success(gv_sql);
+    commit;
+
+  exception
+    when others then
+      pl.logger.error(gv_sql);
+      rollback;
+      raise;
+  end;
+
+
 
 END;
