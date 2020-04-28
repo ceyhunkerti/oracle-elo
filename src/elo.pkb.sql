@@ -349,7 +349,7 @@ AS
     end if;
 
     select count(1) into v_result from util.elo_columns t
-    where t.name = v_name and t.source_col = v_column;
+    where t.name = v_name and t.target_col = v_column;
 
     return case v_result when 1 then true else false end;
   end;
