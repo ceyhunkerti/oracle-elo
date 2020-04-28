@@ -475,7 +475,13 @@ AS
           insert into util.elo_columns (
             name, source_col, target_col
           ) values (
-            '''||i_name||''', '''||trim(v_tokens(i))||''','''||trim(v_tokens(i))||'''
+            '''||i_name||''',
+            case
+              when instr('''||trim(v_tokens(i))||''', ''"'') = 0
+              then upper('''||trim(v_tokens(i))||''')
+              else '''||trim(v_tokens(i))||'''
+            end,
+            '''||trim(v_tokens(i))||'''
           )
         ';
         execute immediate gv_sql;
