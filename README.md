@@ -98,7 +98,10 @@ to define extraction rule for a table.
         i_name    => 'my_extraction',
         i_source  => 'src_owner.src_table_name',
         i_target  => 'trg_owner.trg_table_name',
-        i_columns => 'first_col,second_col,another_col',
+        -- you can use new line and space in i_columns
+        i_columns => 'first_col,second_col,another_col,
+          yet_another_col, some_col_name
+        ',
         i_db_link => 'my_db_link'
         i_filter  => 'my_column = 2'
       );
