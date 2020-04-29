@@ -293,15 +293,15 @@ AS
     v_column_name varchar2(128);
     v_result dbms_sql.varchar2_table;
     v_index number := 1;
+    v_name varchar2(128) := i_name;
   begin
+
+    if instr(v_name, '"') = 0 then v_name := upper(v_name); end if;
+
     gv_sql := '
       select column_name from all_tab_cols@'||i_db_link||'
       where
-        case
-          when instr('''||i_name||''', ''"'') = 0
-          then upper('''||i_name||''')
-          else '''||i_name||'''
-        end = owner||''.''||table_name
+        '''||v_name||''' = owner||''.''||table_name
         and data_type not in (''CLOB'', ''LOB'') --! add others
         and hidden_column = ''NO''
       order by column_id
@@ -402,6 +402,7 @@ AS
     e_source_parameter_error  exception;
     pragma exception_init(e_source_parameter_error,  -20170);
     v_tokens dbms_sql.varchar2_table;
+    v_token  varchar2(128);
   begin
     gv_proc := 'define';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc||'-'||i_source);
@@ -477,18 +478,18 @@ AS
 
     v_tokens := pl.split(i_columns);
     for i in v_tokens.first .. v_tokens.last loop
-      if is_in_elo_columns(i_name, v_tokens(i)) = false then
+
+      v_token := trim(translate(v_tokens(i), chr(10)||chr(13), ' '));
+      if instr(v_token, '"') = 0 then v_token := upper(v_token); end if;
+
+      if is_in_elo_columns(i_name, v_token) = false then
         gv_sql := '
           insert into util.elo_columns (
             name, source_col, target_col
           ) values (
-            '''||i_name||''',
-            case
-              when instr('''||trim(v_tokens(i))||''', ''"'') = 0
-              then upper('''||trim(v_tokens(i))||''')
-              else '''||trim(v_tokens(i))||'''
-            end,
-            '''||trim(v_tokens(i))||'''
+            '''||i_name ||''',
+            '''||v_token||''',
+            '''||v_token||'''
           )
         ';
         execute immediate gv_sql;
