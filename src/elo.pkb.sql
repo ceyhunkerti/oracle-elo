@@ -562,8 +562,12 @@ AS
 
     gv_sql := 'delete from util.elo_columns where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
+    execute immediate gv_sql;
+
     gv_sql := 'delete from util.elo_tables where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
+    execute immediate gv_sql;
+
     commit;
 
   exception
@@ -589,6 +593,8 @@ AS
 
     gv_sql := 'delete from util.elo_columns where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
+    execute immediate gv_sql;
+
     commit;
 
   exception
