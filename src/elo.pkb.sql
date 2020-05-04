@@ -532,20 +532,20 @@ AS
   end;
 
   -- sugar for delete
-  procedure del(i_mapping varchar2) is
+  procedure del(i_name varchar2) is
   begin
-    elo.delete(i_mapping);
+    elo.delete(i_name);
   end;
 
   -- delete a mapping by name
-  procedure delete(i_mapping varchar2) is
+  procedure delete(i_name varchar2) is
   begin
     gv_proc   := 'delete';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc);
 
-    gv_sql := 'delete from util.elo_columns where name='''||i_mapping||'''';
+    gv_sql := 'delete from util.elo_columns where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
-    gv_sql := 'delete from util.elo_tables where name='''||i_mapping||'''';
+    gv_sql := 'delete from util.elo_tables where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
     commit;
 
@@ -558,19 +558,19 @@ AS
 
 
   -- sugar for delete_columns
-  procedure delcols(i_mapping varchar2) is
+  procedure delcols(i_name varchar2) is
   begin
-    delete_columns(i_mapping);
+    delete_columns(i_name);
   end;
 
 
-  procedure delete_columns(i_mapping varchar2) is
+  procedure delete_columns(i_name varchar2) is
   begin
 
     gv_proc   := 'delete_columns';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc);
 
-    gv_sql := 'delete from util.elo_columns where name='''||i_mapping||'''';
+    gv_sql := 'delete from util.elo_columns where name='''||i_name||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
     commit;
 
