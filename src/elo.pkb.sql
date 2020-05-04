@@ -483,7 +483,7 @@ AS
     if is_in_elo_tables(i_name) = false then
       gv_sql := '
         insert into util.elo_tables (
-          name, db_link, source, target, filter, drop_create
+          name, db_link, source, target, filter, drop_create,
           source_hint, target_hint
         ) values (
           '''||i_name||''', '''||i_db_link||''', '''||i_source||''', '''||i_target||''', '''||i_filter||''', 1,
