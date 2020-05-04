@@ -235,6 +235,7 @@ AS
       if i_index_drop != 0 and v_index_created = false then
         pl.exec(v_index_ddls, true);
       end if;
+      rollback;
       raise;
   end;
 
