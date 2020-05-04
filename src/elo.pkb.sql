@@ -361,10 +361,12 @@ AS
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
     i_columns long := null,
-    i_filter  varchar2 := null
+    i_filter  varchar2 := null,
+    i_source_hint varchar2 := null,
+    i_target_hint varchar2 := null
   ) is
   begin
-    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter);
+    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter, i_source_hint, i_target_hint);
   end;
 
   -- sugar for elo.define
@@ -374,10 +376,12 @@ AS
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
     i_columns long := null,
-    i_filter  varchar2 := null
+    i_filter  varchar2 := null,
+    i_source_hint varchar2 := null,
+    i_target_hint varchar2 := null
   ) is
   begin
-    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter);
+    define(i_source, i_name, i_target, i_db_link, i_columns, i_filter, i_source_hint, i_target_hint);
   end;
 
 
@@ -397,7 +401,9 @@ AS
     i_target  varchar2 := null,
     i_db_link varchar2 := null,
     i_columns long := null,
-    i_filter  varchar2 := null
+    i_filter  varchar2 := null,
+    i_source_hint varchar2 := null,
+    i_target_hint varchar2 := null
   ) is
     e_source_parameter_error  exception;
     pragma exception_init(e_source_parameter_error,  -20170);
@@ -423,7 +429,9 @@ AS
         i_target  => i_target,
         i_db_link => v_tokens(2),
         i_columns => i_columns,
-        i_filter  => i_filter
+        i_filter  => i_filter,
+        i_source_hint => i_source_hint,
+        i_target_hint => i_target_hint
       );
       return;
     end if;
@@ -435,7 +443,9 @@ AS
         i_target  => i_source,
         i_db_link => i_db_link,
         i_columns => i_columns,
-        i_filter  => i_filter
+        i_filter  => i_filter,
+        i_source_hint => i_source_hint,
+        i_target_hint => i_target_hint
       );
       return;
     end if;
@@ -448,7 +458,9 @@ AS
         i_target  => i_source,
         i_db_link => i_db_link,
         i_columns => i_columns,
-        i_filter  => i_filter
+        i_filter  => i_filter,
+        i_source_hint => i_source_hint,
+        i_target_hint => i_target_hint
       );
       return;
     end if;
@@ -460,7 +472,9 @@ AS
         i_target  => i_source,
         i_db_link => i_db_link,
         i_columns => pl.make_string(get_remote_col_list(i_source, i_db_link)),
-        i_filter  => i_filter
+        i_filter  => i_filter,
+        i_source_hint => i_source_hint,
+        i_target_hint => i_target_hint
       );
       return;
     end if;
@@ -469,8 +483,10 @@ AS
       gv_sql := '
         insert into util.elo_tables (
           name, db_link, source, target, filter, drop_create
+          source_hint, target_hint
         ) values (
-          '''||i_name||''', '''||i_db_link||''', '''||i_source||''', '''||i_target||''', '''||i_filter||''', 1
+          '''||i_name||''', '''||i_db_link||''', '''||i_source||''', '''||i_target||''', '''||i_filter||''', 1,
+          '''||i_source_hint||''', '''||i_target_hint||'''
         )
       ';
       execute immediate gv_sql;
