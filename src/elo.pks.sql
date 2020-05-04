@@ -39,4 +39,10 @@ AS
 
   procedure add_filter(i_name varchar2, i_filter varchar2);
 
+  procedure del(i_mapping varchar2);
+  procedure delete(i_mapping varchar2);
+
+  procedure delcols(i_mapping varchar2);
+  procedure delete_columns(i_mapping varchar2);
+
 END;

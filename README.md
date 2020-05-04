@@ -130,3 +130,9 @@ to define extraction rule for a table.
     util.elo.add_filter('my_extraction_name', 'my_column = 2');
   end;
   ```
+
+  To delete entries from `elo_tables` or clear column mappings of an extraction use;
+  - `delete`: Deletes an extraction definition including columns.
+  - `del`: Same as `delete`
+  - `delete_columns`: Deletes only column mappings for given extraction.
+  - `delcols`: Same as `delete_columns`
