@@ -102,7 +102,7 @@ AS
     v_delta_data_type varchar2(50);
     v_index_ddls      dbms_sql.varchar2_table;
     v_index_created   boolean := false;
-    v_name            varchar2(100) := upper(i_name)
+    v_name            varchar2(100) := upper(i_name);
   begin
 
     gv_proc := 'RUN';
@@ -298,7 +298,7 @@ AS
     v_table varchar2(128) := i_table;
   begin
 
-    if instr(v_table, '"') = 0 then v_table := upper(v_name); end if;
+    if instr(v_table, '"') = 0 then v_table := upper(v_table); end if;
 
     gv_sql := '
       select column_name from all_tab_cols@'||i_db_link||'
