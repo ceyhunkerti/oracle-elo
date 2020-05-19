@@ -156,7 +156,7 @@ AS
     end if;
 
     begin
-      for c in (select source_col, target_col from util.ELO_COLUMNS where excluded = 0 and name = i_name) loop
+      for c in (select source_col, target_col from util.ELO_COLUMNS where excluded = 0 and name = v_name) loop
         v_source_cols := v_source_cols || c.source_col || ',';
         v_target_cols := v_target_cols || c.target_col || ',';
       end loop;
