@@ -535,7 +535,7 @@ AS
       set filter =
         case when filter is null then '''||i_filter||''' else '''||' and '||i_filter||''' end
       where
-        name = '''||i_name||'''
+        upper(name) = '''||upper(i_name)||'''
     ';
 
     execute immediate gv_sql;
@@ -561,11 +561,11 @@ AS
     gv_proc   := 'delete';
     pl.logger := util.logtype.init(gv_pck||'.'||gv_proc);
 
-    gv_sql := 'delete from util.elo_columns where name='''||i_name||'''';
+    gv_sql := 'delete from util.elo_columns where upper(name)='''||upper(i_name)||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
     execute immediate gv_sql;
 
-    gv_sql := 'delete from util.elo_tables where name='''||i_name||'''';
+    gv_sql := 'delete from util.elo_tables where upper(name)='''||upper(i_name)||'''';
     pl.logger.success(SQL%ROWCOUNT || ' : deleted', gv_sql);
     execute immediate gv_sql;
 
