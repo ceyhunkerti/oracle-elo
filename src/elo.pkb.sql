@@ -102,19 +102,20 @@ AS
     v_delta_data_type varchar2(50);
     v_index_ddls      dbms_sql.varchar2_table;
     v_index_created   boolean := false;
+    v_name            varchar2(100) := upper(i_name)
   begin
 
     gv_proc := 'RUN';
 
     -- Initialize Log Variables
-    pl.logger := util.logtype.init(gv_pck||'.'||gv_proc||'-'||i_name);
+    pl.logger := util.logtype.init(gv_pck||'.'||gv_proc||'-'||v_name);
 
-    if is_excluded(i_name) = true then
-      pl.logger.warning(i_name || ' is EXCLUDED!');
+    if is_excluded(v_name) = true then
+      pl.logger.warning(v_name || ' is EXCLUDED!');
       goto end_proc;
     end if;
 
-    set_status(i_name, GV_RUNNING);
+    set_status(v_name, GV_RUNNING);
 
     pl.logger.info('Started extraction ...');
 
@@ -124,7 +125,7 @@ AS
     into
       v_db_link, v_source, v_target, v_filter, v_source_hint, v_target_hint, v_delta_column, v_last_delta,
       v_drop_create, v_create_options, v_analyze
-    from util.ELO_TABLES where name = i_name;
+    from util.ELO_TABLES where name = v_name;
 
     if trim(v_target_hint) is not null and instr(v_target_hint,'/*+') = 0
     then
@@ -163,7 +164,7 @@ AS
       v_source_cols := rtrim(v_source_cols, ',');
       v_target_cols := rtrim(v_target_cols, ',');
     exception when no_data_found then
-      pl.logger.warning(i_name || ': All columns excluded or no elo def!');
+      pl.logger.warning(v_name || ': All columns excluded or no elo def!');
       goto end_proc;
     end;
 
@@ -215,7 +216,7 @@ AS
 
     if v_delta_column is not null then
       prc_update_last_delta(
-        i_name  => i_name,
+        i_name  => v_name,
         i_table => v_target,
         i_delta_col => v_delta_column,
         i_delta_col_type => v_delta_data_type
@@ -227,11 +228,11 @@ AS
     end if;
 
     <<end_proc>>
-    set_status(i_name, GV_SUCCESS);
+    set_status(v_name, GV_SUCCESS);
   exception
     when others then
       pl.logger.error(SQLCODE||' : '||SQLERRM, gv_sql);
-      set_status(i_name, GV_ERROR);
+      set_status(v_name, GV_ERROR);
       if i_index_drop != 0 and v_index_created = false then
         pl.exec(v_index_ddls, true);
       end if;
@@ -288,22 +289,22 @@ AS
   end;
 
   -- private
-  function get_remote_col_list(i_name varchar2, i_db_link varchar2) return dbms_sql.varchar2_table is
+  function get_remote_col_list(i_table varchar2, i_db_link varchar2) return dbms_sql.varchar2_table is
     type source_cursor_type is ref cursor;
     c source_cursor_type;
     v_column_name varchar2(128);
     v_result dbms_sql.varchar2_table;
     v_index number := 1;
-    v_name varchar2(128) := i_name;
+    v_table varchar2(128) := i_table;
   begin
 
-    if instr(v_name, '"') = 0 then v_name := upper(v_name); end if;
+    if instr(v_table, '"') = 0 then v_table := upper(v_name); end if;
 
     gv_sql := '
       select column_name from all_tab_cols@'||i_db_link||'
       where
-        '''||v_name||''' = owner||''.''||table_name
-        and data_type not in (''CLOB'', ''LOB'') --! add others
+        '''||v_table||''' = owner||''.''||table_name
+        and data_type not in (''CLOB'', ''LOB'') --! todo: add others
         and hidden_column = ''NO''
       order by column_id
     ';
